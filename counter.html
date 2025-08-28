@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter App</title>
+    <link rel="stylesheet" href="commons.css">
+    <style>
+
+        .counter-app {
+            margin-top: -100px;
+        }
+
+        .count {
+            font-size: 8rem;
+            min-height: 100px;
+            line-height: 100px;
+            text-align: center;
+            padding-top: 40px;
+            padding-bottom: 20px;
+        }
+
+        .count-status {
+            font-size: 2rem;
+            padding-bottom: 40px;
+        }
+
+        .control {
+            display: flex;
+            gap: 20px;
+            margin-left: -20px;
+            padding: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+        function Counter() {
+            const [count, setCount] = React.useState(0);
+            return (
+                <>
+                    <div
+                        style={{ color: count > 0 ? 'green' : count < 0 ? 'red' : 'gray' }}
+                        className="count"
+                    >
+                        {count}
+                    </div>
+
+                    <div
+                        className="count-status"
+                        style={{ color: count > 0 ? 'green' : count < 0 ? 'red' : 'gray' }}
+                    >
+                        {count > 0 ? "Dương" : count < 0 ? "Âm" : "Bằng không"}
+                    </div>
+
+                    <div className="control">
+                        <button
+                            onClick={() => setCount(count - 1)}
+                            className="btn btn-md"
+                        >
+                            Decrease
+                        </button>
+
+                        <button
+                            onClick={() => setCount(count + 1)}
+                            className="btn btn-md"
+                        >
+                            Increase
+                        </button>
+
+                        <button
+                            onClick={() => setCount(0)}
+                            className="btn btn-md"
+                        >
+                            Reset
+                        </button>
+                    </div>
+                </>
+            )
+        }
+
+        const app = (
+            <div className="counter-app app-center">
+                <h2 className="heading-title">Counter app :D</h2>
+                <Counter />
+            </div >
+        )
+
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(app);
+    </script>
+
+</body>
+
+</html>
