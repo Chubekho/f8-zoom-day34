@@ -1,8 +1,10 @@
-let uniqId = 0;
+let uniqId = -1;
 
 function TodoApp() {
     const [inputValue, setInputValue] = React.useState('');
     const [todos, setTodos] = React.useState([]);
+    const [edited, setEdited] = React.useState(false);
+    const [editId, setEditId] = React.useState()
 
     const handleInputChange = (e) => {
         setInputValue(e.target.value); // Lấy giá trị từ input
@@ -11,10 +13,39 @@ function TodoApp() {
     const handleSubmit = (e) => {
         e.preventDefault(); // Ngăn trang reload khi submit form
         if (inputValue.trim()) {
-            setTodos([...todos, { id: ++uniqId, text: inputValue, completed: false }]);
-            setInputValue(''); // Reset input sau khi thêm
+            if (!edited) {
+                setTodos([...todos, { id: ++uniqId, text: inputValue, completed: false }]);
+                setInputValue(''); // Reset input sau khi thêm
+            } else {
+                handleEditTodo(editId);
+                setInputValue(''); // Reset input sau khi thêm
+            }
         }
     };
+
+    const handleCheckedTodo = (id) => {
+        const newTodos = todos.map(todo =>
+            todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        );
+        setTodos(newTodos);
+    }
+
+    const handleDeleteTodo = (id) => {
+        const isConfirm = confirm('Bạn có muốn xóa công việc này không !')
+        if (isConfirm) {
+            const newTodos = todos.filter(todo => todo.id !== id)
+            setTodos(newTodos)
+        }
+    }
+
+    const handleEditTodo = (id) => {
+        const newTodos = todos.map(todo =>
+            todo.id === id ? { ...todo, text: inputValue } : todo
+        );
+        setTodos(newTodos);
+        setEdited(false);
+        setEditId(null);
+    }
 
     return (
         <div>
@@ -24,16 +55,49 @@ function TodoApp() {
                     onChange={handleInputChange}
                     placeholder="Nhập task mới..."
                 />
-                <button type="submit">Thêm</button>
+                <button
+                    type="submit"
+                >
+                    {edited ? 'Sửa' : 'Thêm'}
+                </button>
             </form>
 
             <div className="task-list">
                 {todos.map((todo) => (
-                    <div key={todo.id}>
-                        <i class="fa-regular fa-square"></i>
-                        {/* <i class="fa-solid fa-square-check"></i> */}
-                        <div>{todo.text}</div>
-                        <i class="fa-solid fa-trash"></i>
+                    <div
+                        className={`task-item ${todo.completed ? "completed" : ""}`}
+                        style={{ display: 'flex' }}
+                        key={todo.id}>
+                        <div
+                            className="task-item__btn check-btn"
+                            onClick={() => handleCheckedTodo(todo.id)}
+                        >
+                            {todo.completed ?
+                                <i className="fa-solid fa-square-check"></i> :
+                                <i className="fa-regular fa-square"></i>
+                            }
+                        </div>
+
+                        <p>{todo.text}</p>
+
+                        <div
+                            className="task-item__btn"
+                            onClick={() => {
+                                setInputValue(todo.text);
+                                setEditId(todo.id)
+                                setEdited(!edited)
+                            }}
+                        >
+                            <i className="fa-solid fa-pen-to-square"></i>
+                        </div>
+
+                        <div
+                            className="task-item__btn"
+                            onClick={() => handleDeleteTodo(todo.id)}
+                        >
+                            <i className="fa-solid fa-trash"></i>
+                        </div>
+
                     </div>
                 ))}
             </div>
