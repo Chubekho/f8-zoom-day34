@@ -1,119 +1,25 @@
-let uniqId = -1;
+function Product() {
+    const [products, setProducts] = React.useState([]);
 
-function TodoApp() {
-    const [inputValue, setInputValue] = React.useState('');
-    const [todos, setTodos] = React.useState([]);
-    const [edited, setEdited] = React.useState(false);
-    const [editId, setEditId] = React.useState()
+    React.useEffect(() => {
+        fetch('https://jsonplaceholder.typicode.com/posts?_limit=12')
+            .then(res => res.json())
+            .then(data => setProducts(data))
+            .catch(err => console.error("Error: ", err));
+    }, [])
 
-    const handleInputChange = (e) => {
-        setInputValue(e.target.value); // Lấy giá trị từ input
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault(); // Ngăn trang reload khi submit form
-        if (inputValue.trim()) {
-            if (!edited) {
-                setTodos([...todos, { id: ++uniqId, text: inputValue, completed: false }]);
-                setInputValue(''); // Reset input sau khi thêm
-            } else {
-                handleEditTodo(editId);
-                setInputValue(''); // Reset input sau khi thêm
-            }
-        }
-    };
-
-    const handleCheckedTodo = (id) => {
-        const newTodos = todos.map(todo =>
-            todo.id === id ? { ...todo, completed: !todo.completed } : todo
-        );
-        setTodos(newTodos);
-    }
-
-    const handleDeleteTodo = (id) => {
-        const isConfirm = confirm('Bạn có muốn xóa công việc này không !')
-        if (isConfirm) {
-            const newTodos = todos.filter(todo => todo.id !== id)
-            setTodos(newTodos)
-        }
-    }
-
-    const handleEditTodo = (id) => {
-        const newTodos = todos.map(todo =>
-            todo.id === id ? { ...todo, text: inputValue } : todo
-        );
-        setTodos(newTodos);
-        setEdited(false);
-        setEditId(null);
+    if (!products) {
+        return <p>Loading...</p>;
     }
 
     return (
         <div>
-            <form onSubmit={handleSubmit}>
-                <input
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    placeholder="Nhập task mới..."
-                />
-                <button
-                    type="submit"
-                >
-                    {edited ? 'Sửa' : 'Thêm'}
-                </button>
-            </form>
-
-            <div className="task-list">
-                {todos.map((todo) => (
-                    <div
-                        className={`task-item ${todo.completed ? "completed" : ""}`}
-                        style={{ display: 'flex' }}
-                        key={todo.id}>
-                        <div
-                            className="task-item__btn check-btn"
-                            onClick={() => handleCheckedTodo(todo.id)}
-                        >
-                            {todo.completed ?
-                                <i className="fa-solid fa-square-check"></i> :
-                                <i className="fa-regular fa-square"></i>
-                            }
-                        </div>
-
-                        <p>{todo.text}</p>
-
-                        <div
-                            className="task-item__btn"
-                            onClick={() => {
-                                setInputValue(todo.text);
-                                setEditId(todo.id)
-                                setEdited(!edited)
-                            }}
-                        >
-                            <i className="fa-solid fa-pen-to-square"></i>
-                        </div>
-
-                        <div
-                            className="task-item__btn"
-                            onClick={() => handleDeleteTodo(todo.id)}
-                        >
-                            <i className="fa-solid fa-trash"></i>
-                        </div>
-
-                    </div>
-                ))}
-            </div>
-
+            {products.map(product => (
+                <h1>243</h1>
+            ))}
         </div>
-    );
+    )
 }
 
-
-
-const app = (
-    <div className="todo-app app-center">
-        <h2 className="heading-title">Todo App</h2>
-        <TodoApp />
-    </div>
-)
-
-const root = ReactDOM.createRoot(document.querySelector('#root'))
-root.render(app)
+const root = ReactDOM.createRoot(document.querySelector("#root"));
+root.render(<Product />);

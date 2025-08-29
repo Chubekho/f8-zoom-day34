@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo List</title>
     <link rel="stylesheet" href="commons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+        integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         .task-item.completed {
             text-decoration: line-through;
@@ -13,13 +16,135 @@
         }
     </style>
 </head>
+
 <body>
     <div id="root"></div>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script type="text/babel" src="main.js"></script>
+    <script type="text/babel">
+        let uniqId = -1;
+
+        function TodoApp() {
+            const [inputValue, setInputValue] = React.useState('');
+            const [todos, setTodos] = React.useState([]);
+            const [edited, setEdited] = React.useState(false);
+            const [editId, setEditId] = React.useState()
+
+            const handleInputChange = (e) => {
+                setInputValue(e.target.value); // Lấy giá trị từ input
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault(); // Ngăn trang reload khi submit form
+                if (inputValue.trim()) {
+                    if (!edited) {
+                        setTodos([...todos, { id: ++uniqId, text: inputValue, completed: false }]);
+                        setInputValue(''); // Reset input sau khi thêm
+                    } else {
+                        handleEditTodo(editId);
+                        setInputValue(''); // Reset input sau khi thêm
+                    }
+                }
+            };
+
+            const handleCheckedTodo = (id) => {
+                const newTodos = todos.map(todo =>
+                    todo.id === id ? { ...todo, completed: !todo.completed } : todo
+                );
+                setTodos(newTodos);
+            }
+
+            const handleDeleteTodo = (id) => {
+                const isConfirm = confirm('Bạn có muốn xóa công việc này không !')
+                if (isConfirm) {
+                    const newTodos = todos.filter(todo => todo.id !== id)
+                    setTodos(newTodos)
+                }
+            }
+
+            const handleEditTodo = (id) => {
+                const newTodos = todos.map(todo =>
+                    todo.id === id ? { ...todo, text: inputValue } : todo
+                );
+                setTodos(newTodos);
+                setEdited(false);
+                setEditId(null);
+            }
+
+            return (
+                <div>
+                    <form onSubmit={handleSubmit}>
+                        <input
+                            value={inputValue}
+                            onChange={handleInputChange}
+                            placeholder="Nhập task mới..."
+                        />
+                        <button
+                            type="submit"
+                        >
+                            {edited ? 'Sửa' : 'Thêm'}
+                        </button>
+                    </form>
+
+                    <div className="task-list">
+                        {todos.map((todo) => (
+                            <div
+                                className={`task-item ${todo.completed ? "completed" : ""}`}
+                                style={{ display: 'flex' }}
+                                key={todo.id}>
+                                <div
+                                    className="task-item__btn check-btn"
+                                    onClick={() => handleCheckedTodo(todo.id)}
+                                >
+                                    {todo.completed ?
+                                        <i className="fa-solid fa-square-check"></i> :
+                                        <i className="fa-regular fa-square"></i>
+                                    }
+                                </div>
+
+                                <p>{todo.text}</p>
+
+                                <div
+                                    className="task-item__btn"
+                                    onClick={() => {
+                                        setInputValue(todo.text);
+                                        setEditId(todo.id)
+                                        setEdited(!edited)
+                                    }}
+                                >
+                                    <i className="fa-solid fa-pen-to-square"></i>
+                                </div>
+
+                                <div
+                                    className="task-item__btn"
+                                    onClick={() => handleDeleteTodo(todo.id)}
+                                >
+                                    <i className="fa-solid fa-trash"></i>
+                                </div>
+
+                            </div>
+                        ))}
+                    </div>
+
+
+                </div>
+            );
+        }
+
+
+
+        const app = (
+            <div className="todo-app app-center">
+                <h2 className="heading-title">Todo App</h2>
+                <TodoApp />
+            </div>
+        )
+
+        const root = ReactDOM.createRoot(document.querySelector('#root'))
+        root.render(app)
+
+    </script>
 </body>
+
 </html>
-
-
